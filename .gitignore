@@ -1,19 +1,57 @@
 local function createGui(parent)
-	--TextLabel1--
-	local TextLabel1 = Instance.new("TextLabel",parent)
-	TextLabel1["TextWrapped"] = true
-	TextLabel1["TextColor3"] = Color3.new(1, 1, 1)
-	TextLabel1["Text"] = "0 FPS"
-	TextLabel1["TextXAlignment"] = Enum.TextXAlignment.Right
-	TextLabel1["TextStrokeTransparency"] = 0.5
-	TextLabel1["TextSize"] = 14
-	TextLabel1["Font"] = Enum.Font.SourceSans
-	TextLabel1["Name"] = "fps_label"
-	TextLabel1["Position"] = UDim2.new(0.326672584, 0, 0.0282320231, 0)
-	TextLabel1["Size"] = UDim2.new(0.188501418, 0, 0.0358803421, 0)
-	TextLabel1["BackgroundTransparency"] = 1
-	TextLabel1["TextScaled"] = true
-	TextLabel1["BackgroundColor3"] = Color3.new(1, 1, 1)
-	----TextLabel1----
+	--ScreenGui1--
+	local ScreenGui1 = Instance.new("ScreenGui",parent)
+	ScreenGui1["Name"] = "fps_counter"
+	----ScreenGui1----
+	--TextLabel2--
+	local TextLabel2 = Instance.new("TextLabel",ScreenGui1)
+	TextLabel2["TextWrapped"] = true
+	TextLabel2["TextColor3"] = Color3.new(1, 1, 1)
+	TextLabel2["Text"] = "0 FPS"
+	TextLabel2["TextXAlignment"] = Enum.TextXAlignment.Right
+	TextLabel2["TextStrokeTransparency"] = 0.5
+	TextLabel2["TextSize"] = 14
+	TextLabel2["Font"] = Enum.Font.SourceSans
+	TextLabel2["Name"] = "fps_label"
+	TextLabel2["Position"] = UDim2.new(0.326672584, 0, 0.0282320231, 0)
+	TextLabel2["Size"] = UDim2.new(0.188501418, 0, 0.0358803421, 0)
+	TextLabel2["BackgroundTransparency"] = 1
+	TextLabel2["TextScaled"] = true
+	TextLabel2["BackgroundColor3"] = Color3.new(1, 1, 1)
+	----TextLabel2----
+	--Script3--
+	local Script3 = Instance.new("Script",ScreenGui1)
+	Script3["Name"] = "counter_main"
+	----Script3----
+	--NumberValue4--
+	local NumberValue4 = Instance.new("NumberValue",ScreenGui1)
+	NumberValue4["Name"] = "update_rate"
+	NumberValue4["Value"] = 1
+	----NumberValue4----
+	spawn(function() --Source for Script3
+		local script = Script3
+		local services = {
+			["run_service"] = game:GetService("RunService"),
+		}
+		
+		local gui = script.Parent
+		local fps_label = gui:WaitForChild("fps_label")
+		local update_rate = gui:WaitForChild("update_rate").Value
+		update_rate = (update_rate < 0.25 or update_rate > 2) and 1 or update_rate
+		
+		local frames_rendered = 0
+		local last_update = tick() - update_rate
+		local multiplier = 1 / update_rate
+		services["run_service"].RenderStepped:Connect(
+			function()
+				if tick() - last_update >= update_rate then
+					fps_label.Text = tostring(math.round(frames_rendered * multiplier)).. " FPS"
+					frames_rendered = 0; last_update = tick()
+				else
+					frames_rendered += 1
+				end
+			end
+		)
+	end)
 end
 createGui(game.CoreGui) --coregui by default you should but change it
